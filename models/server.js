@@ -7,6 +7,7 @@ class Server{
         this.app = express();
         this.port=process.env.PORT;
         this.usuariosPath = '/api/usuarios';
+        this.variable = process.env.VARIABLE;
 
         //Middlewares
         this.middlewares();
