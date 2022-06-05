@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 class Server{
 
@@ -9,6 +10,9 @@ class Server{
         this.usuariosPath = '/api/usuarios';
         this.variable = process.env.VARIABLE;
 
+        // Conectar a base de datos.
+        this.conectarDB();
+
         //Middlewares
         this.middlewares();
 
@@ -16,6 +20,10 @@ class Server{
         // Rutas de mi aplicación.
         this.routes();
 
+    }
+
+    async conectarDB() {
+        await dbConnection();
     }
 
     middlewares() {
@@ -39,6 +47,7 @@ class Server{
     listen() {
         this.app.listen(this.port,() => {
             console.log('Servidor corriendo en puerto',this.port)
+            // console.log('Se ha definido la variable ', this.variable)
         });
     }
 

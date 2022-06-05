@@ -1,34 +1,59 @@
 const { response, request } = require('express');
 
 
+const bcryptsjs=require('bcryptjs');
+const Usuario = require('../models/usuario');
+const usuario = require('../models/usuario');
+
+
 const usuariosGet = (req = request, res = response) => {
 
     const {a, b} = req.query;
 
     res.json({
-        msg:'metodo get funcionando desde el controlador',
+        msg:' El nuevo metodo get funcionando desde el controlador nuevo',
         a,
-        b
+        b,
+        // variable
     })
 }
 
-const usuariosPost = (req, res = response) => {
+const usuariosPost = async (req, res = response) => {
 
-    const {nombre, edad }= req.body;
+    //  En el caso de que solo quiera desestructurar google
+    // const {google,...resto} = req.body;
+
+    const { nombre, correo, password, rol } = req.body;
+    const usuario = new Usuario ({nombre,correo,password,rol}) ;
+    
+    // Encriptar la contraseña.
+    const salt = bcryptsjs.genSaltSync();
+    usuario.password = bcryptsjs.hashSync( password, salt);
+
+    // Guardar en BD.
+    await usuario.save();
 
     res.json({
         msg:'metodo post funcionando desde el controlador',
-        nombre,
-        edad
+        usuario
     })
 }
-const usuariosPut = (req, res = response) => {
+const usuariosPut = async (req, res = response) => {
 
     const { id } = req.params;
+    const { password, google,correo, ...resto} = req.body;
+
+    if (password) {
+        const salt = bcryptsjs.genSaltSync();
+        resto.password = bcryptsjs.hashSync( password, salt);
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate( id, resto);
 
     res.json({
         msg:'metodo put funcionando desde el controlador',
-        id
+        id,
+        resto
     })
 }
 const usuariosPatch = (req, res = response) => {
