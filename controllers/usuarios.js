@@ -6,16 +6,29 @@ const Usuario = require('../models/usuario');
 const usuario = require('../models/usuario');
 
 
-const usuariosGet = (req = request, res = response) => {
+const usuariosGet = async (req = request, res = response) => {
 
-    const {a, b} = req.query;
+    // const {a, b} = req.query;
+    const { limite = 5, desde = 0 } = req.query;
+
+    const query = { estado: true };
+    // const usuarios = await Usuario.find(query)
+    //     .skip(Number(desde))
+    //     .limit(number(lijmite));
+
+    // const total = await Usuario.count(query)
+
+    const [ total, usuarios ] = await Promise.all([
+        Usuario.count( query ),
+        Usuario.find( query )
+            .skip( Number(desde ))
+            .limit(Number(limite))        
+    ]);
 
     res.json({
-        msg:' El nuevo metodo get funcionando desde el controlador nuevo',
-        a,
-        b,
-        // variable
-    })
+        total,
+        usuarios
+    });
 }
 
 const usuariosPost = async (req, res = response) => {
@@ -50,21 +63,24 @@ const usuariosPut = async (req, res = response) => {
 
     const usuario = await Usuario.findByIdAndUpdate( id, resto);
 
-    res.json({
-        msg:'metodo put funcionando desde el controlador',
-        id,
-        resto
-    })
+    res.json(usuario)
 }
 const usuariosPatch = (req, res = response) => {
     res.json({
         msg:'metodo patch funcionando desde el controlador'
     })
 }
-const usuariosDelete = (req, res = response) => {
-    res.json({
-        msg:'metodo delete funcionando desde el controlador'
-    })
+const usuariosDelete = async (req, res = response) => {
+
+    const{ id } = req.params;
+
+    // Borrado físico
+    // const usuario = await Usuario.findByIdAndDelete( id );
+
+    // Borrado lógico
+    const usuario = await Usuario.findByIdAndUpdate( id, {estado: false});
+
+    res.json(usuario);
 }
 
 

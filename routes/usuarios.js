@@ -30,7 +30,11 @@ router.put('/:id',[
 ], usuariosPut );
 
 router.patch('/', usuariosPatch );
-router.delete('/', usuariosDelete );
-    check('correo', 'El correo no es válido').isEmail(),
+router.delete('/:id',[
+    check('id', 'No es un ID válido').isMongoId(),
+    check('id').custom( existeUsuarioPorId ),
+    validarCampos    
+], usuariosDelete );
+    
 
 module.exports = router;
